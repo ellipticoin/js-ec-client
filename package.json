@@ -1,0 +1,36 @@
+{
+  "name": "ec-client",
+  "version": "0.0.1",
+  "description": "Ellipticoin API client",
+  "main": "./lib/index.js",
+  "types": "./lib/index.d.ts",
+  "files": [
+    "lib/**/*"
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "watch": "tsc -w",
+    "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
+    "lint": "tslint -p tsconfig.json"
+  },
+  "keywords": [
+    "ellipticoin"
+  ],
+  "author": "Mason Fischer <mason@kissr.co>",
+  "license": "MIT",
+  "devDependencies": {
+    "prettier": "^1.18.2",
+    "tslint": "^5.20.0",
+    "tslint-config-prettier": "^1.18.0",
+    "typescript": "^3.6.3"
+  },
+  "dependencies": {
+    "@types/node": "^12.7.9",
+    "borc": "^2.1.1",
+    "cbor": "^5.0.1",
+    "libsodium-wrappers-sumo": "^0.7.5",
+    "long": "^4.0.0",
+    "node-fetch": "^2.6.0",
+    "tweetnacl": "^1.0.1"
+  }
+}
