@@ -1,22 +1,36 @@
-var Long = require("long");
 import Contract from "./contract";
+import { bytesToNumber } from "./utils";
 const BALANCE_KEY = new Buffer([0]);
 
-function bytesToNumber(bytes) {
-  return Long.fromBytesLE(Buffer.from(bytes)).toNumber()
-}
-
 export default class TokenContract extends Contract {
-  async approve (recipientAddress, amount) {
-    return this.post("approve", [recipientAddress, amount]);
+  public approve(recipientAddress, amount) {
+    const transaction = this.createTransaction(
+      "approve",
+      recipientAddress,
+      amount,
+    );
+
+    if (this.client) {
+      return this.client.post(transaction);
+    }
   }
 
-  async transfer (recipientAddress, amount) {
-    return this.post("transfer", [recipientAddress, amount]);
+  public transfer(recipientAddress, amount) {
+    const transaction = this.createTransaction(
+      "transfer",
+      recipientAddress,
+      amount,
+    );
+
+    if (this.client) {
+      return this.client.post(transaction);
+    }
   }
 
-  async balanceOf (address) {
-    let balanceBytes = await this.getMemory(Buffer.concat([BALANCE_KEY, address]));
+  public async balanceOf(address) {
+    const balanceBytes = await this.getMemory(
+      Buffer.concat([BALANCE_KEY, address]),
+    );
 
     if (balanceBytes) {
       return bytesToNumber(balanceBytes);
