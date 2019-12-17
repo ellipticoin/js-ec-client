@@ -12,7 +12,9 @@ export const PUBLIC_KEY = new Buffer(
   "b114ed4c88b61b46ff544e9120164cb5dc49a71157c212f76995bf1d6aecab0e",
   "hex",
 );
-export const ELIPITCOIN_SEED_EDGE_SERVERS = ["http://localhost:4460"];
+export const ELIPITCOIN_SEED_EDGE_SERVERS = [
+  "https://davenport.ellipticoin.org:4460",
+];
 export const HOME =
   process.env[process.platform == "win32" ? "USERPROFILE" : "HOME"];
 export const CONFIG_DIR = `${HOME}/.ec-wallet`;
