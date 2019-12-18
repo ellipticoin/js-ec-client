@@ -141,22 +141,7 @@ export default class Client {
 
   public async getMemory(contractAddress, contractName, key) {
     const fullKey = toKey(contractAddress, contractName, key);
-
-    return fetch(this.edgeServer() + "/memory/" + base64url(fullKey))
-      .then(async response => {
-        const arrayBuffer = await response.arrayBuffer();
-        if (arrayBuffer.byteLength) {
-          return arrayBuffer;
-        } else {
-          return null;
-        }
-      })
-      .catch(error => {
-        if (error.response) {
-          throw new Error(`Contract error: ${error.response.body.toString()}`);
-        } else {
-          throw error;
-        }
-      });
+    const response = await fetch(this.edgeServer() + "/memory/" + base64url(fullKey));
+    return cbor.decode(Buffer.from(await response.arrayBuffer()));
   }
 }
