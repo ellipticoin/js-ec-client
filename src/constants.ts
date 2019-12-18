@@ -13,7 +13,7 @@ export const PUBLIC_KEY = new Buffer(
   "hex",
 );
 export const ELIPITCOIN_SEED_EDGE_SERVERS = [
-  "https://davenport.ellipticoin.org:4460",
+  "https://davenport.ellipticoin.org",
 ];
 export const HOME =
   process.env[process.platform == "win32" ? "USERPROFILE" : "HOME"];
