@@ -68,6 +68,7 @@ export default class Client {
     const body = {
       sender: await this.publicKey(),
       gas_limit: 100000000,
+      nonce: await randomUnit32(),
       ...transaction,
     };
     const signedBody = await cbor.encodeAsync({
