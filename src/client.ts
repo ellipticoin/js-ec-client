@@ -1,5 +1,6 @@
 import { CONFIG_PATH, ELIPITCOIN_SEED_EDGE_SERVERS } from "./constants";
 import {
+  randomUnit32,
   base64url,
   fromBytesInt32,
   humanReadableAddressToU32Bytes,
@@ -32,7 +33,6 @@ export default class Client {
     });
   }
   public privateKey: Buffer;
-  public nonce?: number;
 
   constructor({ privateKey }) {
     this.privateKey = privateKey;
@@ -64,34 +64,10 @@ export default class Client {
     });
   }
 
-  public async maybeSetNonce() {
-    if (this.nonce == undefined) {
-      this.nonce = (await this.getNonce()) || 0;
-    }
-  }
-
-  public async getNonce() {
-    const response = await fetch(
-      this.edgeServer() + "/addresses/" + base64url(await this.publicKey()),
-    );
-    if (response.status == 200) {
-      const arrayBuffer = await response.arrayBuffer();
-      return cbor.decode(Buffer.from(arrayBuffer)).highest_nonce;
-    }
-  }
-
-  public incrementNonce() {
-    if (this.nonce) {
-      this.nonce = this.nonce + 1;
-    }
-  }
-
   public async post(transaction) {
-    await this.maybeSetNonce();
     const body = {
       sender: await this.publicKey(),
       gas_limit: 100000000,
-      nonce: this.nonce,
       ...transaction,
     };
     const signedBody = await cbor.encodeAsync({
@@ -106,7 +82,6 @@ export default class Client {
         "Content-Type": "application/cbor",
       },
     });
-    this.incrementNonce();
 
     if (response.status != 201) {
       throw await response.text();

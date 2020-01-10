@@ -6,11 +6,19 @@ const BigNumber = require("bignumber.js");
 import TokenContract from "./token_contract";
 const { WORDS_FILE_PATH } = require("./constants");
 const fs = require("fs");
+const promisify = require("util").promisify;
+const randomBytes = promisify(crypto.randomBytes);
 const ADDRESS_REGEXP = /\w+\w+-\d+/;
 
 export function bytesToNumber(bytes) {
   return Long.fromBytesLE(Buffer.from(bytes)).toNumber();
 }
+
+export async function randomUnit32() {
+  let bytes = await crypto.randomBytes(4)
+  return bytes.readUInt32BE(0, true);
+}
+
 
 export function toBytesInt32(num) {
   const arr = new ArrayBuffer(4);
