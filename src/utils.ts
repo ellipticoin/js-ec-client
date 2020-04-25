@@ -8,6 +8,7 @@ const { WORDS_FILE_PATH } = require("./constants");
 const fs = require("fs");
 const promisify = require("util").promisify;
 const randomBytes = promisify(crypto.randomBytes);
+const Buffer = require("buffer/").Buffer;
 const ADDRESS_REGEXP = /\w+\w+-\d+/;
 
 export function bytesToNumber(bytes) {
@@ -95,7 +96,7 @@ export function balanceKey(address) {
 export function toKey(address, contractName, key) {
   return Buffer.concat([
     Buffer.from(address),
-    padRight(stringToBytes(contractName)),
+    Buffer.from(padRight(stringToBytes(contractName))),
     Buffer.from(key),
   ]);
 }
@@ -109,7 +110,7 @@ function stringToBytes(s) {
 }
 
 function padRight(bytes) {
-  const padded = new Uint8Array(32);
+  const padded = new Uint8Array(255);
   padded.set(Uint8Array.from(bytes));
   return padded;
 }

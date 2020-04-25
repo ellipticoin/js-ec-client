@@ -11,7 +11,7 @@ import {
 const libsodium = require("libsodium-wrappers-sumo");
 const fetch = require("node-fetch");
 const _ = require("lodash");
-const cbor = require("cbor");
+const cbor = require("borc");
 const nacl = require("tweetnacl");
 const fs = require("fs");
 const yaml = require("js-yaml");
@@ -71,13 +71,14 @@ export default class Client {
       nonce: await randomUnit32(),
       ...transaction,
     };
-    const signedBody = await cbor.encodeAsync({
+    const signedBody = await cbor.encode({
       ...body,
-      signature: new Buffer(await this.sign(await cbor.encodeAsync(body))),
+      signature: new Buffer(await this.sign(await cbor.encode(body))),
     });
 
     const response = await fetch(this.edgeServer() + "/transactions", {
       method: "POST",
+      // mode: "cors",
       body: signedBody,
       headers: {
         "Content-Type": "application/cbor",
