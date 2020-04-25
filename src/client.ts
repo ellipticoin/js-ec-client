@@ -16,6 +16,8 @@ const nacl = require("tweetnacl");
 const fs = require("fs");
 const yaml = require("js-yaml");
 const path = require("path");
+var Buffer = require('buffer/').Buffer
+
 function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
