@@ -14,6 +14,7 @@ export const PUBLIC_KEY = new Buffer(
 );
 export const ELIPITCOIN_SEED_EDGE_SERVERS = [
   "https://davenport.ellipticoin.org",
+  // "http://localhost:4461",
 ];
 export const HOME =
   process.env[process.platform == "win32" ? "USERPROFILE" : "HOME"];
