@@ -123,4 +123,10 @@ export default class Client {
     const response = await fetch(this.edgeServer() + "/memory/" + base64url(fullKey));
     return cbor.decode(Buffer.from(await response.arrayBuffer()));
   }
+
+  public async getStorage(contractAddress, contractName, key) {
+    const fullKey = toKey(contractAddress, contractName, key);
+    const response = await fetch(this.edgeServer() + "/storage/" + base64url(fullKey));
+    return cbor.decode(Buffer.from(await response.arrayBuffer()));
+  }
 }

@@ -31,6 +31,16 @@ export default class Contract {
     }
   }
 
+  public getStorage(key) {
+    if (this.client) {
+      return this.client.getStorage(
+        this.contractAddress,
+        this.contractName,
+        key,
+      );
+    }
+  }
+
   public createTransaction(func, ...args) {
     return {
       contract_address: Buffer.concat([
