@@ -16,7 +16,6 @@ const nacl = require("tweetnacl");
 const fs = require("fs");
 const yaml = require("js-yaml");
 const path = require("path");
-var Buffer = require('buffer/').Buffer
 
 function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
@@ -25,19 +24,22 @@ function sleep(ms) {
 export default class Client {
 
   public static fromConfig(configPath) {
-    const privateKey = new Buffer(
+    const privateKey = Buffer.from(
       yaml.safeLoad(fs.readFileSync(configPath)).privateKey,
       "base64",
     );
 
     return new this({
+      bootnodes: ELIPITCOIN_SEED_EDGE_SERVERS,
       privateKey,
     });
   }
   public privateKey: Buffer;
+  public bootnodes: string[];
 
-  constructor({ privateKey }) {
+  constructor({ privateKey, bootnodes = ELIPITCOIN_SEED_EDGE_SERVERS}) {
     this.privateKey = privateKey;
+    this.bootnodes = bootnodes;
   }
 
   public edgeServer() {
@@ -45,7 +47,7 @@ export default class Client {
     // and call a list of edge nodes round-robin.
     // For now just send transactions directly to the seed nodes
 
-    return _.sample(ELIPITCOIN_SEED_EDGE_SERVERS);
+    return _.sample(this.bootnodes);
   }
 
   public async sign(message) {
@@ -55,12 +57,12 @@ export default class Client {
 
   public async publicKey() {
     await libsodium.ready;
-    return new Buffer(libsodium.crypto_sign_ed25519_sk_to_pk(this.privateKey));
+    return Buffer.from(libsodium.crypto_sign_ed25519_sk_to_pk(this.privateKey));
   }
 
   public async deploy(contractName, contractCode, constructorParams) {
     return this.post({
-      contract_address: Buffer.concat([new Buffer(32), new Buffer("System")]),
+      contract_address: Buffer.concat([Buffer.alloc(32), Buffer.from("System")]),
       function: "create_contract",
       arguments: [contractName, contractCode, constructorParams],
     });
@@ -75,7 +77,7 @@ export default class Client {
     };
     const signedBody = await cbor.encode({
       ...body,
-      signature: new Buffer(await this.sign(await cbor.encode(body))),
+      signature: Buffer.from(await this.sign(await cbor.encode(body))),
     });
 
     const response = await fetch(this.edgeServer() + "/transactions", {

@@ -1,15 +1,15 @@
+import TokenContract from "./token_contract";
 const _ = require("lodash");
 const cbor = require("borc");
 const crypto = require("crypto");
 const Long = require("long");
 const BigNumber = require("bignumber.js");
-import TokenContract from "./token_contract";
 const { WORDS_FILE_PATH } = require("./constants");
 const fs = require("fs");
 const promisify = require("util").promisify;
 const randomBytes = promisify(crypto.randomBytes);
-const Buffer = require("buffer/").Buffer;
 const ADDRESS_REGEXP = /\w+\w+-\d+/;
+export const Ellipticoin = new TokenContract(Buffer.alloc(32), "Ellipticoin")
 
 export function bytesToNumber(bytes) {
   return Long.fromBytesLE(Buffer.from(bytes)).toNumber();
@@ -63,7 +63,7 @@ export function humanReadableAddressToU32Bytes(address) {
     (words.indexOf(identifiers[1]) << 11) |
     words.indexOf(identifiers[2]);
 
-  return new Buffer(toBytesInt32(int32Address));
+  return Buffer.from(toBytesInt32(int32Address));
 }
 
 export async function coerceArgs(client, args) {
@@ -72,7 +72,9 @@ export async function coerceArgs(client, args) {
       if (arg.match(ADDRESS_REGEXP)) {
         return await client.resolveAddress(arg);
       } else if (arg.startsWith("base64:")) {
-        return new Buffer(arg.slice(7), "base64");
+        return Array.from(Buffer.from(arg.slice(7), "base64"));
+      } else if (arg.startsWith("hex:")) {
+        return Array.from(Buffer.from(arg.slice(4), "hex"));
       } else if (!isNaN(arg)) {
         return +arg;
       } else {
@@ -88,7 +90,7 @@ function readWords() {
 
 export function balanceKey(address) {
   const key = new Uint8Array(address.length + 1);
-  key.set(new Buffer([0]), 0);
+  key.set(Buffer.from([1]), 0);
   key.set(address, 1);
   return key;
 }
@@ -106,7 +108,7 @@ export function toAddress(address, contractName) {
 }
 
 function stringToBytes(s) {
-  return new Buffer(s, "utf8");
+  return Buffer.from(s, "utf8");
 }
 
 function padRight(bytes) {
@@ -124,12 +126,12 @@ export function base64url(bytes) {
 
 export function tokenContractFromString(tokenString) {
   const tokens = {
-    EC: new TokenContract(new Buffer(32), "Ellipticoin"),
+    EC: new TokenContract(Buffer.alloc(32), "Ellipticoin"),
   };
   if (tokens[tokenString]) {
     return tokens[tokenString];
   } else {
     const [address, contractName] = tokenString.split(":");
-    return new TokenContract(new Buffer(address, "base64"), contractName);
+    return new TokenContract(Buffer.from(address, "base64"), contractName);
   }
 }

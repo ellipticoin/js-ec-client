@@ -1,6 +1,6 @@
 import Contract from "./contract";
 import { bytesToNumber } from "./utils";
-const BALANCE_KEY = new Buffer([0]);
+const BALANCE_KEY = Buffer.from([1]);
 
 export default class TokenContract extends Contract {
   public approve(recipientAddress, amount) {
