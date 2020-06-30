@@ -1,11 +1,4 @@
 import Client from "./client";
-import {
-  BASE_CONTRACT_ADDRESS,
-  CONFIG_PATH,
-  ELIPITCOIN_SEED_EDGE_SERVERS,
-  TOKEN_CONTRACT_NAME,
-} from "./constants";
-const _ = require("lodash");
 
 export default class Contract {
   public client?: Client;
@@ -43,12 +36,12 @@ export default class Contract {
 
   public createTransaction(func, ...args) {
     return {
+      arguments: args,
       contract_address: Buffer.concat([
         this.contractAddress,
         Buffer.from(this.contractName, "utf8"),
       ]),
       function: func,
-      arguments: args,
     };
   }
 

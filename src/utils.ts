@@ -1,25 +1,22 @@
+import BigNumber   from "bignumber.js";
+import cbor   from "borc";
+import * as crypto from "crypto";
+import * as fs  from "fs";
+import _ from "lodash";
+import Long   from "long";
+import { WORDS_FILE_PATH }   from "./constants";
 import TokenContract from "./token_contract";
-const _ = require("lodash");
-const cbor = require("borc");
-const crypto = require("crypto");
-const Long = require("long");
-const BigNumber = require("bignumber.js");
-const { WORDS_FILE_PATH } = require("./constants");
-const fs = require("fs");
-const promisify = require("util").promisify;
-const randomBytes = promisify(crypto.randomBytes);
 const ADDRESS_REGEXP = /\w+\w+-\d+/;
-export const Ellipticoin = new TokenContract(Buffer.alloc(32), "Ellipticoin")
+export const Ellipticoin = new TokenContract(Buffer.alloc(32), "Ellipticoin");
 
 export function bytesToNumber(bytes) {
   return Long.fromBytesLE(Buffer.from(bytes)).toNumber();
 }
 
 export async function randomUnit32() {
-  let bytes = await crypto.randomBytes(4)
-  return bytes.readUInt32BE(0, true);
+  const bytes = await crypto.randomBytes(4);
+  return bytes.readUInt32BE(0);
 }
-
 
 export function toBytesInt32(num) {
   const arr = new ArrayBuffer(4);
@@ -46,29 +43,16 @@ export function objectHash(object) {
 }
 
 function sha256(message) {
-  return crypto
-    .createHash("sha256")
-    .update(message, "utf8")
-    .digest();
+  return crypto.createHash("sha256").update(message, "utf8").digest();
 }
 
 export function formatBalance(balance) {
   return new BigNumber(balance).div(10000).toFixed(4);
 }
-export function humanReadableAddressToU32Bytes(address) {
-  const identifiers = address.split("-").reverse();
-  const words = readWords();
-  const int32Address =
-    (parseInt(identifiers[0]) << 22) |
-    (words.indexOf(identifiers[1]) << 11) |
-    words.indexOf(identifiers[2]);
-
-  return Buffer.from(toBytesInt32(int32Address));
-}
 
 export async function coerceArgs(client, args) {
   return Promise.all(
-    args.map(async arg => {
+    args.map(async (arg) => {
       if (arg.match(ADDRESS_REGEXP)) {
         return await client.resolveAddress(arg);
       } else if (arg.startsWith("base64:")) {
@@ -96,11 +80,11 @@ export function balanceKey(address) {
 }
 
 export function toKey(address, contractName, key) {
-  return Buffer.concat([
-    Buffer.from(address),
-    Buffer.from(padRight(stringToBytes(contractName))),
-    Buffer.from(key),
-  ]);
+  return [
+    base64url(Buffer.from(address)),
+    contractName,
+    base64url(Buffer.from(key)),
+  ].join("/");
 }
 
 export function toAddress(address, contractName) {

@@ -1,4 +1,4 @@
-const path = require("path");
+import * as path from "path";
 export const BASE_CONTRACT_ADDRESS = Buffer.from(
   "0000000000000000000000000000000000000000000000000000000000000000",
   "hex",
@@ -14,10 +14,10 @@ export const PUBLIC_KEY = Buffer.from(
 );
 export const ELIPITCOIN_SEED_EDGE_SERVERS = [
   "https://davenport.ellipticoin.org",
-  // "http://localhost:4461",
 ];
+export const DEFAULT_NETWORK_ID = 1793045504;
 export const HOME =
-  process.env[process.platform == "win32" ? "USERPROFILE" : "HOME"];
+  process.env[process.platform === "win32" ? "USERPROFILE" : "HOME"];
 export const CONFIG_DIR = `${HOME}/.ec-wallet`;
 export const CONFIG_PATH = `${CONFIG_DIR}/config.yaml`;
 export const WORDS_FILE_PATH = path.resolve(

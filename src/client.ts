@@ -1,28 +1,22 @@
-import { CONFIG_PATH, ELIPITCOIN_SEED_EDGE_SERVERS } from "./constants";
+import * as cbor from "borc";
+import * as fs from "fs";
+import yaml from "js-yaml";
+import * as libsodium from "libsodium-wrappers-sumo";
+import * as _ from "lodash";
+import fetch from "node-fetch";
+import { DEFAULT_NETWORK_ID, ELIPITCOIN_SEED_EDGE_SERVERS } from "./constants";
 import {
-  randomUnit32,
   base64url,
-  fromBytesInt32,
-  humanReadableAddressToU32Bytes,
   objectHash,
-  toBytesInt32,
+  randomUnit32,
   toKey,
 } from "./utils";
-const libsodium = require("libsodium-wrappers-sumo");
-const fetch = require("node-fetch");
-const _ = require("lodash");
-const cbor = require("borc");
-const nacl = require("tweetnacl");
-const fs = require("fs");
-const yaml = require("js-yaml");
-const path = require("path");
 
 function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 export default class Client {
-
   public static fromConfig(configPath) {
     const privateKey = Buffer.from(
       yaml.safeLoad(fs.readFileSync(configPath)).privateKey,
@@ -30,14 +24,19 @@ export default class Client {
     );
 
     return new this({
-      bootnodes: ELIPITCOIN_SEED_EDGE_SERVERS,
       privateKey,
     });
   }
   public privateKey: Buffer;
+  public networkId: number;
   public bootnodes: string[];
 
-  constructor({ privateKey, bootnodes = ELIPITCOIN_SEED_EDGE_SERVERS}) {
+  constructor({
+    privateKey,
+    networkId = DEFAULT_NETWORK_ID,
+    bootnodes = ELIPITCOIN_SEED_EDGE_SERVERS,
+  }) {
+    this.networkId = networkId;
     this.privateKey = privateKey;
     this.bootnodes = bootnodes;
   }
@@ -62,17 +61,21 @@ export default class Client {
 
   public async deploy(contractName, contractCode, constructorParams) {
     return this.post({
-      contract_address: Buffer.concat([Buffer.alloc(32), Buffer.from("System")]),
-      function: "create_contract",
       arguments: [contractName, contractCode, constructorParams],
+      contract_address: Buffer.concat([
+        Buffer.alloc(32),
+        Buffer.from("System"),
+      ]),
+      function: "create_contract",
     });
   }
 
   public async post(transaction) {
     const body = {
-      sender: await this.publicKey(),
+      network_id: this.networkId,
       gas_limit: 100000000,
       nonce: await randomUnit32(),
+      sender: await this.publicKey(),
       ...transaction,
     };
     const signedBody = await cbor.encode({
@@ -81,18 +84,18 @@ export default class Client {
     });
 
     const response = await fetch(this.edgeServer() + "/transactions", {
-      method: "POST",
-      // mode: "cors",
       body: signedBody,
       headers: {
         "Content-Type": "application/cbor",
       },
+      redirect: 'follow',
+      method: "POST",
     });
 
-    if (response.status != 201) {
-      throw await response.text();
+    if (response.ok) {
+      return cbor.decode(Buffer.from(await response.arrayBuffer()));
     } else {
-      return body;
+      throw await response.text();
     }
   }
 
@@ -101,7 +104,9 @@ export default class Client {
     try {
       return await this.getTransaction(transactionHash);
     } catch (err) {
-      if (tries == 1) { throw new Error("Transaction too too long to be mined"); }
+      if (tries === 1) {
+        throw new Error("Transaction too too long to be mined");
+      }
       await sleep(500);
       return await this.waitForTransactionToBeMined(transaction, tries - 1);
     }
@@ -110,8 +115,8 @@ export default class Client {
   public async getTransaction(transactionHash) {
     return fetch(
       this.edgeServer() + "/transactions/" + base64url(transactionHash),
-    ).then(async response => {
-      if (response.status == 404) {
+    ).then(async (response) => {
+      if (response.status === 404) {
         throw new Error("Transaction not found");
       } else {
         const arrayBuffer = await response.arrayBuffer();
@@ -122,13 +127,17 @@ export default class Client {
 
   public async getMemory(contractAddress, contractName, key) {
     const fullKey = toKey(contractAddress, contractName, key);
-    const response = await fetch(this.edgeServer() + "/memory/" + base64url(fullKey));
+    const response = await fetch(
+      this.edgeServer() + "/memory/" + fullKey,
+    );
     return cbor.decode(Buffer.from(await response.arrayBuffer()));
   }
 
   public async getStorage(contractAddress, contractName, key) {
     const fullKey = toKey(contractAddress, contractName, key);
-    const response = await fetch(this.edgeServer() + "/storage/" + base64url(fullKey));
+    const response = await fetch(
+      this.edgeServer() + "/storage/" + fullKey,
+    );
     return cbor.decode(Buffer.from(await response.arrayBuffer()));
   }
 }
