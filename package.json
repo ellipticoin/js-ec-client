@@ -34,6 +34,7 @@
     "lodash": "^4.17.15",
     "long": "^4.0.0",
     "node-fetch": "^2.6.0",
-    "tweetnacl": "^1.0.1"
+    "tweetnacl": "^1.0.1",
+    "yaml": "^1.10.0"
   }
 }

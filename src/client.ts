@@ -1,16 +1,11 @@
 import * as cbor from "borc";
 import * as fs from "fs";
-import yaml from "js-yaml";
 import * as libsodium from "libsodium-wrappers-sumo";
 import * as _ from "lodash";
-import fetch from "node-fetch";
+import * as fetch from "node-fetch";
+import * as YAML from "yaml";
 import { DEFAULT_NETWORK_ID, ELIPITCOIN_SEED_EDGE_SERVERS } from "./constants";
-import {
-  base64url,
-  objectHash,
-  randomUnit32,
-  toKey,
-} from "./utils";
+import { base64url, objectHash, randomUnit32, toKey } from "./utils";
 
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -19,7 +14,7 @@ function sleep(ms) {
 export default class Client {
   public static fromConfig(configPath) {
     const privateKey = Buffer.from(
-      yaml.safeLoad(fs.readFileSync(configPath)).privateKey,
+      YAML.parse(fs.readFileSync(configPath, "utf8")).privateKey,
       "base64",
     );
 
@@ -88,7 +83,7 @@ export default class Client {
       headers: {
         "Content-Type": "application/cbor",
       },
-      redirect: 'follow',
+      redirect: "follow",
       method: "POST",
     });
 
@@ -127,17 +122,13 @@ export default class Client {
 
   public async getMemory(contractAddress, contractName, key) {
     const fullKey = toKey(contractAddress, contractName, key);
-    const response = await fetch(
-      this.edgeServer() + "/memory/" + fullKey,
-    );
+    const response = await fetch(this.edgeServer() + "/memory/" + fullKey);
     return cbor.decode(Buffer.from(await response.arrayBuffer()));
   }
 
   public async getStorage(contractAddress, contractName, key) {
     const fullKey = toKey(contractAddress, contractName, key);
-    const response = await fetch(
-      this.edgeServer() + "/storage/" + fullKey,
-    );
+    const response = await fetch(this.edgeServer() + "/storage/" + fullKey);
     return cbor.decode(Buffer.from(await response.arrayBuffer()));
   }
 }

@@ -1,10 +1,10 @@
-import BigNumber   from "bignumber.js";
-import cbor   from "borc";
+import BigNumber from "bignumber.js";
+import * as cbor from "borc";
 import * as crypto from "crypto";
-import * as fs  from "fs";
-import _ from "lodash";
-import Long   from "long";
-import { WORDS_FILE_PATH }   from "./constants";
+import * as fs from "fs";
+import * as _ from "lodash";
+import Long from "long";
+import { WORDS_FILE_PATH } from "./constants";
 import TokenContract from "./token_contract";
 const ADDRESS_REGEXP = /\w+\w+-\d+/;
 export const Ellipticoin = new TokenContract(Buffer.alloc(32), "Ellipticoin");
