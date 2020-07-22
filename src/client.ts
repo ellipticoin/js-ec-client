@@ -123,12 +123,20 @@ export default class Client {
   public async getMemory(contractAddress, contractName, key) {
     const fullKey = toKey(contractAddress, contractName, key);
     const response = await fetch(this.edgeServer() + "/memory/" + fullKey);
-    return cbor.decode(Buffer.from(await response.arrayBuffer()));
+    const bytes = Buffer.from(await response.arrayBuffer());
+
+    if(bytes.byteLength > 0) {
+        return cbor.decode(bytes);
+    }
   }
 
   public async getStorage(contractAddress, contractName, key) {
     const fullKey = toKey(contractAddress, contractName, key);
     const response = await fetch(this.edgeServer() + "/storage/" + fullKey);
-    return cbor.decode(Buffer.from(await response.arrayBuffer()));
+    const bytes = Buffer.from(await response.arrayBuffer());
+
+    if(bytes.byteLength > 0) {
+        return cbor.decode(bytes);
+    }
   }
 }
