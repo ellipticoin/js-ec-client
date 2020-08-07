@@ -1,9 +1,10 @@
+import * as YAML from "yaml";
+import * as _ from "lodash";
 import * as cbor from "borc";
+import * as fetch from "node-fetch";
 import * as fs from "fs";
 import * as libsodium from "libsodium-wrappers-sumo";
-import * as _ from "lodash";
-import * as fetch from "node-fetch";
-import * as YAML from "yaml";
+
 import { DEFAULT_NETWORK_ID, ELIPITCOIN_SEED_EDGE_SERVERS } from "./constants";
 import { base64url, objectHash, randomUnit32, toKey } from "./utils";
 
@@ -70,12 +71,12 @@ export default class Client {
       network_id: this.networkId,
       gas_limit: 100000000,
       nonce: await randomUnit32(),
-      sender: await this.publicKey(),
+      sender:  Array.from(await this.publicKey()),
       ...transaction,
     };
     const signedBody = await cbor.encode({
       ...body,
-      signature: Buffer.from(await this.sign(await cbor.encode(body))),
+      signature: Array.from(Buffer.from(await this.sign(await cbor.encode(body)))),
     });
 
     const response = await fetch(this.edgeServer() + "/transactions", {

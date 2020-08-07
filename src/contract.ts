@@ -1,13 +1,14 @@
 import Client from "./client";
 
 export default class Contract {
-  public client?: Client;
-  public contractAddress: Buffer;
-  public contractName: string;
+  public client: Client;
+  public legislator: Buffer;
+  public name: string;
 
-  constructor(contractAddress, contractName) {
-    this.contractAddress = contractAddress;
-    this.contractName = contractName;
+  constructor(client, legislator, name) {
+    this.client = client;
+    this.legislator = legislator;
+    this.name = name;
   }
 
   public setClient(client) {
@@ -17,8 +18,8 @@ export default class Contract {
   public getMemory(key) {
     if (this.client) {
       return this.client.getMemory(
-        this.contractAddress,
-        this.contractName,
+        this.legislator,
+        this.name,
         key,
       );
     }
@@ -27,8 +28,8 @@ export default class Contract {
   public getStorage(key) {
     if (this.client) {
       return this.client.getStorage(
-        this.contractAddress,
-        this.contractName,
+        this.legislator,
+        this.name,
         key,
       );
     }
@@ -37,10 +38,7 @@ export default class Contract {
   public createTransaction(func, ...args) {
     return {
       arguments: args,
-      contract_address: Buffer.concat([
-        this.contractAddress,
-        Buffer.from(this.contractName, "utf8"),
-      ]),
+      contract_address: [this.legislator, this.name],
       function: func,
     };
   }

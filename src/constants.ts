@@ -1,8 +1,5 @@
 import * as path from "path";
-export const BASE_CONTRACT_ADDRESS = Buffer.from(
-  "0000000000000000000000000000000000000000000000000000000000000000",
-  "hex",
-);
+export const SYSTEM_ADDRESS = new Array(32).fill(0);
 export const TOKEN_CONTRACT_NAME = "Ellipticoin";
 export const PRIVATE_KEY = Buffer.from(
   "2a185960faf3ffa84ff8886e8e2e0f8ba0fff4b91adad23108bfef5204390483b114ed4c88b61b46ff544e9120164cb5dc49a71157c212f76995bf1d6aecab0e",
