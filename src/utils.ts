@@ -9,15 +9,15 @@ import { WORDS_FILE_PATH } from "./constants";
 const ADDRESS_REGEXP = /\w+\w+-\d+/;
 
 export function encodeAddress(address) {
-    if(address.length === 2) {
-        return {
-            "Contract": address,
-        }
-    } else {
-        return {
-            "PublicKey": address,
-        }
-    }
+  if (address.length === 2) {
+    return {
+      Contract: address,
+    };
+  } else {
+    return {
+      PublicKey: address,
+    };
+  }
 }
 
 export function transactionHash(transaction) {
@@ -85,8 +85,6 @@ function padRight(bytes) {
   padded.set(Uint8Array.from(bytes));
   return padded;
 }
-
-
 
 export function base64url(bytes) {
   return Buffer.from(bytes)

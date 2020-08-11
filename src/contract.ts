@@ -17,21 +17,13 @@ export default class Contract {
 
   public getMemory(key) {
     if (this.client) {
-      return this.client.getMemory(
-        this.legislator,
-        this.name,
-        key,
-      );
+      return this.client.getMemory(this.legislator, this.name, key);
     }
   }
 
   public getStorage(key) {
     if (this.client) {
-      return this.client.getStorage(
-        this.legislator,
-        this.name,
-        key,
-      );
+      return this.client.getStorage(this.legislator, this.name, key);
     }
   }
 

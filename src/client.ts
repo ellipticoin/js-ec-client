@@ -24,6 +24,7 @@ export default class Client {
     });
   }
   public privateKey: Buffer;
+  public eventSource: EventSource;
   public networkId: number;
   public bootnodes: string[];
 
@@ -35,19 +36,26 @@ export default class Client {
     this.networkId = networkId;
     this.privateKey = privateKey;
     this.bootnodes = bootnodes;
+    this.eventSource = new EventSource(this.edgeServer());
   }
 
   public edgeServer() {
-    // Once we go live we'll ask the seed servers for their peers
-    // and call a list of edge nodes round-robin.
-    // For now just send transactions directly to the seed nodes
-
     return _.sample(this.bootnodes);
   }
 
   public async sign(message) {
     await libsodium.ready;
     return libsodium.crypto_sign_detached(message, this.privateKey);
+  }
+
+  public addBlockListener(callback) {
+    this.eventSource.addEventListener("block", (event: any) =>
+      callback(event.data),
+    );
+  }
+
+  public close() {
+    this.eventSource.close();
   }
 
   public async publicKey() {
@@ -71,12 +79,14 @@ export default class Client {
       network_id: this.networkId,
       gas_limit: 100000000,
       nonce: await randomUnit32(),
-      sender:  Array.from(await this.publicKey()),
+      sender: Array.from(await this.publicKey()),
       ...transaction,
     };
     const signedBody = await cbor.encode({
       ...body,
-      signature: Array.from(Buffer.from(await this.sign(await cbor.encode(body)))),
+      signature: Array.from(
+        Buffer.from(await this.sign(await cbor.encode(body))),
+      ),
     });
 
     const response = await fetch(this.edgeServer() + "/transactions", {
@@ -126,8 +136,8 @@ export default class Client {
     const response = await fetch(this.edgeServer() + "/memory/" + fullKey);
     const bytes = Buffer.from(await response.arrayBuffer());
 
-    if(bytes.byteLength > 0) {
-        return cbor.decode(bytes);
+    if (bytes.byteLength > 0) {
+      return cbor.decode(bytes);
     }
   }
 
@@ -136,8 +146,8 @@ export default class Client {
     const response = await fetch(this.edgeServer() + "/storage/" + fullKey);
     const bytes = Buffer.from(await response.arrayBuffer());
 
-    if(bytes.byteLength > 0) {
-        return cbor.decode(bytes);
+    if (bytes.byteLength > 0) {
+      return cbor.decode(bytes);
     }
   }
 }
