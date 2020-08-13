@@ -43,6 +43,7 @@ export default class Token extends Contract {
 
   issuerHash() {
     if (this.issuer.length === 2) {
+      console.log(this.issuer)
       return sha256(
         Buffer.concat([
           Buffer.from(this.issuer[0]),

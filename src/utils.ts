@@ -26,6 +26,17 @@ export function transactionHash(transaction) {
   );
 }
 
+export function tokenId(ticker) {
+  return Array.from(padBuffer(Buffer.from(ticker), 32));
+}
+
+export function padBuffer(buffer, len) {
+  return Buffer.concat([
+    buffer,
+    Buffer.from(Array(len - buffer.length).fill(0)),
+  ]);
+}
+
 export function objectHash(object) {
   return sha256(cbor.encode(object));
 }

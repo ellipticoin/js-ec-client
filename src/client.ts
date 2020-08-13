@@ -1,5 +1,6 @@
 import * as YAML from "yaml";
 import * as _ from "lodash";
+import * as queryString from "query-string";
 import * as cbor from "borc";
 import * as fetch from "node-fetch";
 import * as fs from "fs";
@@ -105,25 +106,39 @@ export default class Client {
     }
   }
 
-  public async waitForTransactionToBeMined(transaction, tries = 600) {
-    const transactionHash = objectHash(transaction);
-    try {
-      return await this.getTransaction(transactionHash);
-    } catch (err) {
-      if (tries === 1) {
-        throw new Error("Transaction too too long to be mined");
-      }
-      await sleep(500);
-      return await this.waitForTransactionToBeMined(transaction, tries - 1);
-    }
-  }
-
   public async getTransaction(transactionHash) {
     return fetch(
-      this.edgeServer() + "/transactions/" + base64url(transactionHash),
+      this.edgeServer() + "/transactions/" + transactionHash,
     ).then(async (response) => {
       if (response.status === 404) {
         throw new Error("Transaction not found");
+      } else {
+        const arrayBuffer = await response.arrayBuffer();
+        return cbor.decode(Buffer.from(arrayBuffer));
+      }
+    });
+  }
+
+  public async getBlocks(query) {
+    console.log("blocks")
+    return fetch(
+      this.edgeServer() + "/blocks?" + queryString.stringify(query),
+    ).then(async (response) => {
+      if (response.status === 404) {
+        throw new Error("Block not found");
+      } else {
+        const arrayBuffer = await response.arrayBuffer();
+        return cbor.decode(Buffer.from(arrayBuffer));
+      }
+    });
+  }
+
+  public async getBlock(blockHash) {
+    return fetch(
+      this.edgeServer() + "/blocks/" + blockHash
+    ).then(async (response) => {
+      if (response.status === 404) {
+        throw new Error("Block not found");
       } else {
         const arrayBuffer = await response.arrayBuffer();
         return cbor.decode(Buffer.from(arrayBuffer));
