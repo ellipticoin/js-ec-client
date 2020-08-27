@@ -19,6 +19,16 @@ export function encodeAddress(address) {
     };
   }
 }
+export function addressToBuffer(address) {
+    if (address.length === 2) {
+        return Array.from(Buffer.concat([
+          address[0].toBuffer(),
+          Buffer.from(address[1]),
+        ]))
+    } else {
+      return address.toBuffer();
+    }
+  }
 
 export function transactionHash(transaction) {
   return objectHash(
@@ -73,7 +83,7 @@ function readWords() {
 
 export function toKey(address, contractName, key) {
   return [
-    base64url(Buffer.from(address)),
+    base64url(address.toBuffer()),
     contractName,
     base64url(Buffer.from(key)),
   ].join("/");

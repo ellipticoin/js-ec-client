@@ -1,5 +1,5 @@
 import Contract from "./contract";
-import { sha256, encodeAddress } from "./utils";
+import { sha256, encodeAddress, addressToBuffer } from "./utils";
 import { SYSTEM_ADDRESS } from "./constants";
 import base64url from "base64url";
 const BALANCE_KEY = 1;
@@ -17,8 +17,7 @@ export default class Token extends Contract {
   public async transfer(recipientAddress, amount) {
     const transaction = this.createTransaction(
       "transfer",
-      encodeAddress(this.issuer),
-      this.tokenId,
+      [encodeAddress(this.issuer), this.tokenId],
       encodeAddress(recipientAddress),
       amount,
     );
@@ -33,7 +32,7 @@ export default class Token extends Contract {
       (await this.getMemory(
         Buffer.from([
           BALANCE_KEY,
-          ...this.issuerHash(),
+          ...Array.from(addressToBuffer(this.issuer)),
           ...this.tokenId,
           ...address,
         ]),
@@ -43,15 +42,12 @@ export default class Token extends Contract {
 
   issuerHash() {
     if (this.issuer.length === 2) {
-      console.log(this.issuer)
-      return sha256(
-        Buffer.concat([
+        return Array.from(Buffer.concat([
           Buffer.from(this.issuer[0]),
           Buffer.from(this.issuer[1]),
-        ]),
-      );
+        ]))
     } else {
-      return sha256(Buffer.from(this.issuer));
+      return Array.from(Buffer.from(this.issuer));
     }
   }
 

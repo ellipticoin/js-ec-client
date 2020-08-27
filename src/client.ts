@@ -120,7 +120,6 @@ export default class Client {
   }
 
   public async getBlocks(query) {
-    console.log("blocks")
     return fetch(
       this.edgeServer() + "/blocks?" + queryString.stringify(query),
     ).then(async (response) => {
