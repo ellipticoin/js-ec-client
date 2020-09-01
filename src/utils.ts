@@ -11,7 +11,7 @@ const ADDRESS_REGEXP = /\w+\w+-\d+/;
 export function encodeAddress(address) {
   if (address.length === 2) {
     return {
-      Contract: address,
+      Contract: [Array.from(address[0]), address[1]],
     };
   } else {
     return {

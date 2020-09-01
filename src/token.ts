@@ -5,7 +5,7 @@ import base64url from "base64url";
 const BALANCE_KEY = 1;
 
 export default class Token extends Contract {
-  public issuer: [Buffer, string?];
+  public issuer: any;
   public tokenId: number[];
 
   constructor(client, issuer, tokenId) {
@@ -17,7 +17,7 @@ export default class Token extends Contract {
   public async transfer(recipientAddress, amount) {
     const transaction = this.createTransaction(
       "transfer",
-      [encodeAddress(this.issuer), this.tokenId],
+      [this.issuer.toObject(), this.tokenId],
       encodeAddress(recipientAddress),
       amount,
     );
