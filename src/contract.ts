@@ -1,11 +1,14 @@
 import Client from "./client";
 
 export default class Contract {
-  public client: Client;
-  public legislator: Buffer;
-  public name: string;
-
-  constructor(client, legislator, name) {
+  constructor(
+    public client: Client,
+    public legislator: Buffer,
+    public name: string
+    ) {
+    // console.log(client)
+    // console.log(legislator)
+    // console.log(name)
     this.client = client;
     this.legislator = legislator;
     this.name = name;
@@ -30,7 +33,7 @@ export default class Contract {
   public createTransaction(func, ...args) {
     return {
       arguments: args,
-      contract_address: [this.legislator, this.name],
+      contract_address: [Array.from(this.legislator), this.name],
       function: func,
     };
   }

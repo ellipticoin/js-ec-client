@@ -7,6 +7,7 @@ import * as fs from "fs";
 import * as libsodium from "libsodium-wrappers-sumo";
 
 import { DEFAULT_NETWORK_ID, ELIPITCOIN_SEED_EDGE_SERVERS } from "./constants";
+import Pool from "./exchange/pool"
 import { base64url, objectHash, randomUnit32, toKey } from "./utils";
 
 function sleep(ms) {
@@ -143,6 +144,10 @@ export default class Client {
         return cbor.decode(Buffer.from(arrayBuffer));
       }
     });
+  }
+
+  public async getPool(token) {
+    return Pool.fetch(this, token)
   }
 
   public async getMemory(contractAddress, contractName, key) {

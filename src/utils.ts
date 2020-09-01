@@ -19,10 +19,11 @@ export function encodeAddress(address) {
     };
   }
 }
+
 export function addressToBuffer(address) {
     if (address.length === 2) {
         return Array.from(Buffer.concat([
-          address[0].toBuffer(),
+          address[0],
           Buffer.from(address[1]),
         ]))
     } else {
@@ -83,7 +84,7 @@ function readWords() {
 
 export function toKey(address, contractName, key) {
   return [
-    base64url(address.toBuffer()),
+    base64url(address),
     contractName,
     base64url(Buffer.from(key)),
   ].join("/");
