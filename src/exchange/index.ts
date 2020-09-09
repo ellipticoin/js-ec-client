@@ -1,20 +1,23 @@
 import Client from "../client";
-import {SYSTEM_ADDRESS} from "../constants";
+import { SYSTEM_ADDRESS } from "../constants";
 import Contract from "../contract";
-import {encodeAddress} from "../utils";
+import Address from "../address";
+import { encodeAddress } from "../utils";
 import * as cbor from "borc";
 
 export default class Exchange extends Contract {
-    public static memoryNamespace: string[] = [
-        "balance",
-        "baseTokenReserves",
-        "reserves",
-    ];
-    constructor(
-        public client: Client,
-    ) {
-        super(client, SYSTEM_ADDRESS, "Exchange")
-    }
+  public static ADDRESS: Address = Address.newContract(
+    SYSTEM_ADDRESS,
+    "Exchange",
+  );
+  public static memoryNamespace: string[] = [
+    "baseTokenReserves",
+    "reserves",
+    "issuanceReserves",
+  ];
+  constructor(public client: Client) {
+    super(client, SYSTEM_ADDRESS, "Exchange");
+  }
 
   public async createPool(token, amount, initalPrice) {
     const transaction = this.createTransaction(
@@ -54,12 +57,23 @@ export default class Exchange extends Contract {
     }
   }
 
-    public getNamespacedMemory(memoryNamespace, key) {
-        return this.getMemory(
-Buffer.concat([
-            Buffer.from([Exchange.memoryNamespace.indexOf(memoryNamespace)]),
-            key
-        ])
-)
+  public async takeProfits(token) {
+    const transaction = this.createTransaction(
+      "take_profits",
+      [token.issuer.toObject(), Array.from(token.id)],
+    );
+
+    if (this.client) {
+      return this.client.post(transaction);
     }
+  }
+
+  public getNamespacedMemory(memoryNamespace, key) {
+    return this.getMemory(
+      Buffer.concat([
+        Buffer.from([Exchange.memoryNamespace.indexOf(memoryNamespace)]),
+        key,
+      ]),
+    );
+  }
 }

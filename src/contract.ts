@@ -4,8 +4,8 @@ export default class Contract {
   constructor(
     public client: Client,
     public legislator: Buffer,
-    public name: string
-    ) {
+    public name: string,
+  ) {
     // console.log(client)
     // console.log(legislator)
     // console.log(name)
@@ -36,6 +36,17 @@ export default class Contract {
       contract_address: [Array.from(this.legislator), this.name],
       function: func,
     };
+  }
+
+  public async getNamespacedMemory(memoryNamespace, key = new Buffer([])) {
+    return await this.getMemory(
+      Buffer.concat([
+        Buffer.from([
+          (this.constructor as any).memoryNamespace.indexOf(memoryNamespace),
+        ]),
+        key,
+      ]),
+    );
   }
 
   public post(transaction) {

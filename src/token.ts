@@ -1,10 +1,16 @@
-import Contract from "./contract";
-import { sha256, encodeAddress, addressToBuffer } from "./utils";
-import { SYSTEM_ADDRESS } from "./constants";
+import { addressToBuffer, encodeAddress, sha256 } from "./utils";
+
 import base64url from "base64url";
+import { SYSTEM_ADDRESS } from "./constants";
+import Contract from "./contract";
 const BALANCE_KEY = 1;
 
 export default class Token extends Contract {
+  public static memoryNamespace: string[] = [
+    "allowance",
+    "balance",
+    "totalSupply",
+  ];
   public issuer: any;
   public tokenId: number[];
 
@@ -17,7 +23,7 @@ export default class Token extends Contract {
   public async transfer(recipientAddress, amount) {
     const transaction = this.createTransaction(
       "transfer",
-      [this.issuer.toObject(), this.tokenId],
+      this.toObject(),
       encodeAddress(recipientAddress),
       amount,
     );
@@ -27,39 +33,32 @@ export default class Token extends Contract {
     }
   }
 
-  public async getBalance(address) {
+  public async toObject() {
+    return [this.issuer.toObject(), this.tokenId];
+  }
+
+  public async getTotalSupply() {
     return (
-      (await this.getMemory(
-        Buffer.from([
-          BALANCE_KEY,
-          ...Array.from(addressToBuffer(this.issuer)),
-          ...this.tokenId,
-          ...address,
+      (await this.getNamespacedMemory(
+        "totalSupply",
+        Buffer.concat([
+          addressToBuffer(this.issuer),
+          Buffer.from(this.tokenId),
         ]),
       )) || 0
     );
   }
 
-  issuerHash() {
-    if (this.issuer.length === 2) {
-        return Array.from(Buffer.concat([
-          Buffer.from(this.issuer[0]),
-          Buffer.from(this.issuer[1]),
-        ]))
-    } else {
-      return Array.from(Buffer.from(this.issuer));
-    }
-  }
-
-  encodeIssuer() {
-    if (this.issuer.length === 1) {
-      return {
-        PublicKey: this.issuer,
-      };
-    } else {
-      return {
-        Contract: this.issuer,
-      };
-    }
+  public async getBalance(address) {
+    return (
+      (await this.getNamespacedMemory(
+        "balance",
+        Buffer.concat([
+          addressToBuffer(this.issuer),
+          Buffer.from(this.tokenId),
+          Buffer.from(address),
+        ]),
+      )) || 0
+    );
   }
 }

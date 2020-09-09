@@ -1,14 +1,15 @@
 import * as YAML from "yaml";
 import * as _ from "lodash";
-import * as queryString from "query-string";
 import * as cbor from "borc";
 import * as fetch from "node-fetch";
 import * as fs from "fs";
 import * as libsodium from "libsodium-wrappers-sumo";
+import * as queryString from "query-string";
 
 import { DEFAULT_NETWORK_ID, ELIPITCOIN_SEED_EDGE_SERVERS } from "./constants";
-import Pool from "./exchange/pool"
 import { base64url, objectHash, randomUnit32, toKey } from "./utils";
+
+import Pool from "./exchange/pool";
 
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -108,16 +109,16 @@ export default class Client {
   }
 
   public async getTransaction(transactionHash) {
-    return fetch(
-      this.edgeServer() + "/transactions/" + transactionHash,
-    ).then(async (response) => {
-      if (response.status === 404) {
-        throw new Error("Transaction not found");
-      } else {
-        const arrayBuffer = await response.arrayBuffer();
-        return cbor.decode(Buffer.from(arrayBuffer));
-      }
-    });
+    return fetch(this.edgeServer() + "/transactions/" + transactionHash).then(
+      async (response) => {
+        if (response.status === 404) {
+          throw new Error("Transaction not found");
+        } else {
+          const arrayBuffer = await response.arrayBuffer();
+          return cbor.decode(Buffer.from(arrayBuffer));
+        }
+      },
+    );
   }
 
   public async getBlocks(query) {
@@ -134,20 +135,20 @@ export default class Client {
   }
 
   public async getBlock(blockHash) {
-    return fetch(
-      this.edgeServer() + "/blocks/" + blockHash
-    ).then(async (response) => {
-      if (response.status === 404) {
-        throw new Error("Block not found");
-      } else {
-        const arrayBuffer = await response.arrayBuffer();
-        return cbor.decode(Buffer.from(arrayBuffer));
-      }
-    });
+    return fetch(this.edgeServer() + "/blocks/" + blockHash).then(
+      async (response) => {
+        if (response.status === 404) {
+          throw new Error("Block not found");
+        } else {
+          const arrayBuffer = await response.arrayBuffer();
+          return cbor.decode(Buffer.from(arrayBuffer));
+        }
+      },
+    );
   }
 
   public async getPool(token) {
-    return Pool.fetch(this, token)
+    return Pool.fetch(this, token);
   }
 
   public async getMemory(contractAddress, contractName, key) {

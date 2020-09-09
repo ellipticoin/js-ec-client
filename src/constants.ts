@@ -1,7 +1,12 @@
 import * as path from "path";
+
 import Address from "./address";
 export const SYSTEM_ADDRESS = Buffer.alloc(32);
 export const TOKEN_CONTRACT_NAME = "Ellipticoin";
+export const BLOCKS_PER_ERA = 8000000;
+export const NUMBER_OF_ERAS = 8;
+export const BLOCK_TIME = 4;
+export const BASE_FACTOR = 1000000;
 export const PRIVATE_KEY = Buffer.from(
   "2a185960faf3ffa84ff8886e8e2e0f8ba0fff4b91adad23108bfef5204390483b114ed4c88b61b46ff544e9120164cb5dc49a71157c212f76995bf1d6aecab0e",
   "hex",

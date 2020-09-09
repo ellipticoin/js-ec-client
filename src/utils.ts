@@ -1,12 +1,21 @@
-import * as _ from "lodash";
 import * as cbor from "borc";
 import * as crypto from "crypto";
 import * as fs from "fs";
+import * as _ from "lodash";
 
 import BigNumber from "bignumber.js";
 import Long from "long";
-import { WORDS_FILE_PATH } from "./constants";
+import { BASE_FACTOR, BLOCKS_PER_ERA, NUMBER_OF_ERAS, WORDS_FILE_PATH } from "./constants";
+
 const ADDRESS_REGEXP = /\w+\w+-\d+/;
+
+export function blockReward(blockNumber) {
+    if (blockNumber > BLOCKS_PER_ERA * NUMBER_OF_ERAS) {
+        return 0;
+    }
+    const era = Math.floor(blockNumber / BLOCKS_PER_ERA);
+    return ((1.28*10**8)/2**era)/10**8
+}
 
 export function encodeAddress(address) {
   if (address.length === 2) {
@@ -21,15 +30,12 @@ export function encodeAddress(address) {
 }
 
 export function addressToBuffer(address) {
-    if (address.length === 2) {
-        return Array.from(Buffer.concat([
-          address[0],
-          Buffer.from(address[1]),
-        ]))
-    } else {
-      return address.toBuffer();
-    }
+  if (address.length === 2) {
+    return Array.from(Buffer.concat([address[0], Buffer.from(address[1])]));
+  } else {
+    return address.toBuffer();
   }
+}
 
 export function transactionHash(transaction) {
   return objectHash(
@@ -83,11 +89,9 @@ function readWords() {
 }
 
 export function toKey(address, contractName, key) {
-  return [
-    base64url(address),
-    contractName,
-    base64url(Buffer.from(key)),
-  ].join("/");
+  return [base64url(address), contractName, base64url(Buffer.from(key))].join(
+    "/",
+  );
 }
 
 export function toAddress(address, contractName) {
