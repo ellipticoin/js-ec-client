@@ -7,7 +7,7 @@ import * as libsodium from "libsodium-wrappers-sumo";
 import * as queryString from "query-string";
 
 import { DEFAULT_NETWORK_ID, ELIPITCOIN_SEED_EDGE_SERVERS } from "./constants";
-import { base64url, objectHash, randomUnit32, toKey } from "./utils";
+import { base64url, objectHash, randomUnit32, toKey } from "./helpers";
 
 import Pool from "./exchange/pool";
 

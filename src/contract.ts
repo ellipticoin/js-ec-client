@@ -27,12 +27,14 @@ export default class Contract {
     }
   }
 
-  public createTransaction(func, ...args) {
-    return {
-      arguments: args,
-      contract_address: [Array.from(this.legislator), this.name],
-      function: func,
-    };
+  public post(func, ...args) {
+    if (this.client) {
+      return this.client.post({
+        arguments: args,
+        contract_address: [Array.from(this.legislator), this.name],
+        function: func,
+      });
+    }
   }
 
   public async getNamespacedMemory(memoryNamespace, key = new Buffer([])) {
@@ -44,11 +46,5 @@ export default class Contract {
         key,
       ]),
     );
-  }
-
-  public post(transaction) {
-    if (this.client) {
-      return this.client.post(transaction);
-    }
   }
 }

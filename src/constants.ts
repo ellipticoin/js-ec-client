@@ -1,6 +1,7 @@
 import * as path from "path";
 
 import Address from "./address";
+
 export const SYSTEM_ADDRESS = Buffer.alloc(32);
 export const TOKEN_CONTRACT_NAME = "Ellipticoin";
 export const BLOCKS_PER_ERA = 8000000;

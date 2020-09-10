@@ -1,9 +1,9 @@
-import { addressToBuffer, encodeAddress, sha256 } from "./utils";
+import { addressToBuffer, encodeAddress, sha256 } from "./helpers";
 
 import base64url from "base64url";
 import { SYSTEM_ADDRESS } from "./constants";
 import Contract from "./contract";
-const BALANCE_KEY = 1;
+
 
 export default class Token extends Contract {
   public static memoryNamespace: string[] = [
@@ -21,19 +21,15 @@ export default class Token extends Contract {
   }
 
   public async transfer(recipientAddress, amount) {
-    const transaction = this.createTransaction(
+    return this.post(
       "transfer",
       this.toObject(),
       encodeAddress(recipientAddress),
       amount,
     );
-
-    if (this.client) {
-      return this.client.post(transaction);
-    }
   }
 
-  public async toObject() {
+  public toObject() {
     return [this.issuer.toObject(), this.tokenId];
   }
 

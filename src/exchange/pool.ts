@@ -1,10 +1,9 @@
 import * as _ from "lodash";
 import { SYSTEM_ADDRESS } from "../constants";
 import Contract from "../contract";
+import { addressToBuffer, encodeAddress, sha256 } from "../helpers";
 import Token from "../token";
-import { addressToBuffer, encodeAddress, sha256 } from "../utils";
 import Exchange from "./index";
-const BASE_TOKEN_RESERVES_KEY = 2;
 
 export default class Pool {
   public static async fetch(client, token) {
@@ -57,16 +56,11 @@ export default class Pool {
     if (
       _.isEqual(
         this.token.id,
-        ethTokenId("4748b2e6DB310512Ff9085E533b6C4151ff10746"),
+        Exchange.ethTokenId("4748b2e6DB310512Ff9085E533b6C4151ff10746"),
       )
     ) {
       return 1;
     } else {
-
-        // console.log("vv")
-        // console.log(this.reserves)
-        // console.log(this.baseTokenReserves)
-        // console.log("^^")
       return this.baseTokenReserves / this.reserves || 0;
     }
   }
@@ -97,8 +91,4 @@ export function padBuffer(buffer, len) {
     buffer,
     Buffer.from(Array(len - buffer.length).fill(0)),
   ]);
-}
-
-export function ethTokenId(address) {
-  return Array.from(padBuffer(Buffer.from(address, "hex"), 32));
 }

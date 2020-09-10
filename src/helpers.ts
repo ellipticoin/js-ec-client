@@ -1,20 +1,26 @@
+import * as _ from "lodash";
 import * as cbor from "borc";
 import * as crypto from "crypto";
 import * as fs from "fs";
-import * as _ from "lodash";
+
+import {
+  BASE_FACTOR,
+  BLOCKS_PER_ERA,
+  NUMBER_OF_ERAS,
+  WORDS_FILE_PATH,
+} from "./constants";
 
 import BigNumber from "bignumber.js";
 import Long from "long";
-import { BASE_FACTOR, BLOCKS_PER_ERA, NUMBER_OF_ERAS, WORDS_FILE_PATH } from "./constants";
 
 const ADDRESS_REGEXP = /\w+\w+-\d+/;
 
 export function blockReward(blockNumber) {
-    if (blockNumber > BLOCKS_PER_ERA * NUMBER_OF_ERAS) {
-        return 0;
-    }
-    const era = Math.floor(blockNumber / BLOCKS_PER_ERA);
-    return ((1.28*10**8)/2**era)/10**8
+  if (blockNumber > BLOCKS_PER_ERA * NUMBER_OF_ERAS) {
+    return 0;
+  }
+  const era = Math.floor(blockNumber / BLOCKS_PER_ERA);
+  return (1.28 * 10 ** 8) / 2 ** era / 10 ** 8;
 }
 
 export function encodeAddress(address) {

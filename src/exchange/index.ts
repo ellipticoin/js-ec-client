@@ -1,9 +1,9 @@
+import * as cbor from "borc";
+import Address from "../address";
 import Client from "../client";
 import { SYSTEM_ADDRESS } from "../constants";
 import Contract from "../contract";
-import Address from "../address";
-import { encodeAddress } from "../utils";
-import * as cbor from "borc";
+import { encodeAddress, padBuffer } from "../helpers";
 
 export default class Exchange extends Contract {
   public static ADDRESS: Address = Address.newContract(
@@ -15,57 +15,44 @@ export default class Exchange extends Contract {
     "reserves",
     "issuanceReserves",
   ];
+  public static ethTokenId(address) {
+    return Array.from(padBuffer(Buffer.from(address, "hex"), 32));
+  }
   constructor(public client: Client) {
     super(client, SYSTEM_ADDRESS, "Exchange");
   }
 
   public async createPool(token, amount, initalPrice) {
-    const transaction = this.createTransaction(
+    return this.post(
       "create_pool",
       [token.issuer.toObject(), Array.from(token.id)],
       amount,
       initalPrice,
     );
-
-    if (this.client) {
-      return this.client.post(transaction);
-    }
   }
 
   public async swap(inputToken, outputToken, amount) {
-    const transaction = this.createTransaction(
+    return this.post(
       "swap",
       [inputToken.issuer.toObject(), Array.from(inputToken.id)],
       [outputToken.issuer.toObject(), Array.from(outputToken.id)],
       amount,
     );
-
-    if (this.client) {
-      return this.client.post(transaction);
-    }
   }
 
   public async addLiquidity(token, amount) {
-    const transaction = this.createTransaction(
+    return this.post(
       "add_liqidity",
       [token.issuer.toObject(), Array.from(token.id)],
       amount,
     );
-
-    if (this.client) {
-      return this.client.post(transaction);
-    }
   }
 
   public async takeProfits(token) {
-    const transaction = this.createTransaction(
-      "take_profits",
-      [token.issuer.toObject(), Array.from(token.id)],
-    );
-
-    if (this.client) {
-      return this.client.post(transaction);
-    }
+    return this.post("take_profits", [
+      token.issuer.toObject(),
+      Array.from(token.id),
+    ]);
   }
 
   public getNamespacedMemory(memoryNamespace, key) {
