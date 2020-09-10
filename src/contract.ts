@@ -6,9 +6,6 @@ export default class Contract {
     public legislator: Buffer,
     public name: string,
   ) {
-    // console.log(client)
-    // console.log(legislator)
-    // console.log(name)
     this.client = client;
     this.legislator = legislator;
     this.name = name;
