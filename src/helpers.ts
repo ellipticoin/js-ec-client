@@ -55,8 +55,8 @@ export function tokenId(ticker) {
 
 export function padBuffer(buffer, len) {
   return Buffer.concat([
-    buffer,
     Buffer.from(Array(len - buffer.length).fill(0)),
+    buffer,
   ]);
 }
 

@@ -56,7 +56,7 @@ export default class Pool {
     if (
       _.isEqual(
         this.token.id,
-        Exchange.ethTokenId("4748b2e6DB310512Ff9085E533b6C4151ff10746"),
+        Exchange.ethTokenId("6b175474e89094c44da98b954eedeac495271d0f"),
       )
     ) {
       return 1;
@@ -79,6 +79,10 @@ export default class Pool {
 
   public addLiquidity(amount) {
     return this.exchange.addLiquidity(this.token, amount);
+  }
+
+  public removeLiquidity(amount) {
+    return this.exchange.removeLiquidity(this.token, amount);
   }
 
   public takeProfits() {

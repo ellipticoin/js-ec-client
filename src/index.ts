@@ -2,6 +2,7 @@ export { default as Token } from "./token";
 export { default as Address } from "./address";
 export * from "./address";
 export * from "./helpers";
+export { default as Bridge } from "./bridge";
 export { default as Contract } from "./contract";
 export { default as Pool } from "./exchange/pool";
 export { default as Exchange } from "./exchange/index";

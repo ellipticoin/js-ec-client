@@ -48,6 +48,14 @@ export default class Exchange extends Contract {
     );
   }
 
+  public async removeLiquidity(token, amount) {
+    return this.post(
+      "remove_liqidity",
+      [token.issuer.toObject(), Array.from(token.id)],
+      amount,
+    );
+  }
+
   public async takeProfits(token) {
     return this.post("take_profits", [
       token.issuer.toObject(),
