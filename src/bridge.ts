@@ -10,7 +10,7 @@ export default class Bridge extends Contract {
   public tokenId: number[];
 
   constructor(client, issuer, tokenId) {
-    super(client, SYSTEM_ADDRESS, "Bridge");
+    super(client, "Bridge");
     this.issuer = issuer;
     this.tokenId = tokenId;
   }
@@ -22,10 +22,6 @@ export default class Bridge extends Contract {
       Array.from(recipientAddress),
       amount,
     );
-  }
-
-  public toObject() {
-    return [this.issuer.toObject(), this.tokenId];
   }
 
   public async getTotalSupply() {

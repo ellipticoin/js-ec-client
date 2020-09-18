@@ -24,9 +24,9 @@ export function blockReward(blockNumber) {
 }
 
 export function encodeAddress(address) {
-  if (address.length === 2) {
+  if (typeof address === "string") {
     return {
-      Contract: [Array.from(address[0]), address[1]],
+      Contract: address,
     };
   } else {
     return {
@@ -94,8 +94,8 @@ function readWords() {
   return fs.readFileSync(WORDS_FILE_PATH, "utf8").split("\n");
 }
 
-export function toKey(address, contractName, key) {
-  return [base64url(address), contractName, base64url(Buffer.from(key))].join(
+export function toKey(contractName, key) {
+  return [contractName, base64url(Buffer.from(key))].join(
     "/",
   );
 }

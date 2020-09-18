@@ -7,7 +7,7 @@ import base64url from "base64url";
 export default class Ellipticoin extends Contract {
   public static memoryNamespace: string[] = ["issuanceRewards"];
   constructor(client, issuer, tokenId) {
-    super(client, SYSTEM_ADDRESS, "Ellipticoin");
+    super(client, "Ellipticoin");
   }
 
   public async getIssuanceRewards(address) {

@@ -7,7 +7,6 @@ import Contract from "./contract";
 
 export default class Token extends Contract {
   public static memoryNamespace: string[] = [
-    "allowance",
     "balance",
     "totalSupply",
   ];
@@ -15,7 +14,7 @@ export default class Token extends Contract {
   public tokenId: number[];
 
   constructor(client, issuer, tokenId) {
-    super(client, SYSTEM_ADDRESS, "Token");
+    super(client, "Token");
     this.issuer = issuer;
     this.tokenId = tokenId;
   }
@@ -23,14 +22,10 @@ export default class Token extends Contract {
   public async transfer(recipientAddress, amount) {
     return this.post(
       "transfer",
-      this.toObject(),
-      encodeAddress(recipientAddress),
+      [encodeAddress(this.issuer), this.tokenId],
+      recipientAddress,
       amount,
     );
-  }
-
-  public toObject() {
-    return [this.issuer.toObject(), this.tokenId];
   }
 
   public async getTotalSupply() {
@@ -38,7 +33,7 @@ export default class Token extends Contract {
       (await this.getNamespacedMemory(
         "totalSupply",
         Buffer.concat([
-          addressToBuffer(this.issuer),
+          Buffer.from(this.issuer, "utf8"),
           Buffer.from(this.tokenId),
         ]),
       )) || 0
@@ -50,7 +45,7 @@ export default class Token extends Contract {
       (await this.getNamespacedMemory(
         "balance",
         Buffer.concat([
-          addressToBuffer(this.issuer),
+          Buffer.from(this.issuer, "utf8"),
           Buffer.from(this.tokenId),
           Buffer.from(address),
         ]),

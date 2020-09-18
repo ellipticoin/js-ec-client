@@ -3,11 +3,9 @@ import Client from "./client";
 export default class Contract {
   constructor(
     public client: Client,
-    public legislator: Buffer,
     public name: string,
   ) {
     this.client = client;
-    this.legislator = legislator;
     this.name = name;
   }
 
@@ -17,13 +15,13 @@ export default class Contract {
 
   public getMemory(key) {
     if (this.client) {
-      return this.client.getMemory(this.legislator, this.name, key);
+      return this.client.getMemory(this.name, key);
     }
   }
 
   public getStorage(key) {
     if (this.client) {
-      return this.client.getStorage(this.legislator, this.name, key);
+      return this.client.getStorage(this.name, key);
     }
   }
 
@@ -31,7 +29,7 @@ export default class Contract {
     if (this.client) {
       return this.client.post({
         arguments: args,
-        contract_address: [Array.from(this.legislator), this.name],
+        contract: this.name,
         function: func,
       });
     }

@@ -1,5 +1,4 @@
 import * as _ from "lodash";
-import { SYSTEM_ADDRESS } from "../constants";
 import Contract from "../contract";
 import { addressToBuffer, encodeAddress, sha256 } from "../helpers";
 import Token from "../token";
@@ -11,21 +10,21 @@ export default class Pool {
     const properties = {};
     const baseTokenReserves = await exchange.getNamespacedMemory(
       "baseTokenReserves",
-      Buffer.concat([token.issuer.toBuffer(), Buffer.from(token.id)]),
+      Buffer.concat([Buffer.from(token.issuer, "utf8"), Buffer.from(token.id)]),
     );
     const reserves = await exchange.getNamespacedMemory(
       "reserves",
-      Buffer.concat([token.issuer.toBuffer(), Buffer.from(token.id)]),
+      Buffer.concat([Buffer.from(token.issuer, "utf8"), Buffer.from(token.id)]),
     );
     const issuanceReserves = await exchange.getNamespacedMemory(
       "issuanceReserves",
-      Buffer.concat([token.issuer.toBuffer(), Buffer.from(token.id)]),
+      Buffer.concat([Buffer.from(token.issuer, "utf8"), Buffer.from(token.id)]),
     );
 
     const poolToken = new Token(
       client,
-      Exchange.ADDRESS,
-      sha256(Buffer.concat([token.issuer.toBuffer(), Buffer.from(token.id)])),
+      "Exchange",
+      sha256(Buffer.concat([Buffer.from(token.issuer, "utf8"), Buffer.from(token.id)])),
     );
 
     return new this(exchange, token, {

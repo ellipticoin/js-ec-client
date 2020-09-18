@@ -1,10 +1,10 @@
-import * as YAML from "yaml";
-import * as _ from "lodash";
 import * as cbor from "borc";
-import * as fetch from "node-fetch";
 import * as fs from "fs";
 import * as libsodium from "libsodium-wrappers-sumo";
+import * as _ from "lodash";
+import * as fetch from "node-fetch";
 import * as queryString from "query-string";
+import * as YAML from "yaml";
 
 import { DEFAULT_NETWORK_ID, ELIPITCOIN_SEED_EDGE_SERVERS } from "./constants";
 import { base64url, objectHash, randomUnit32, toKey } from "./helpers";
@@ -69,8 +69,7 @@ export default class Client {
   public async deploy(contractName, contractCode, constructorParams) {
     return this.post({
       arguments: [contractName, contractCode, constructorParams],
-      contract_address: Buffer.concat([
-        Buffer.alloc(32),
+      contract: Buffer.concat([
         Buffer.from("System"),
       ]),
       function: "create_contract",
@@ -80,7 +79,6 @@ export default class Client {
   public async post(transaction) {
     const body = {
       network_id: this.networkId,
-      gas_limit: 100000000,
       nonce: await randomUnit32(),
       sender: Array.from(await this.publicKey()),
       ...transaction,
@@ -97,8 +95,8 @@ export default class Client {
       headers: {
         "Content-Type": "application/cbor",
       },
-      redirect: "follow",
       method: "POST",
+      redirect: "follow",
     });
 
     if (response.ok) {
@@ -151,8 +149,8 @@ export default class Client {
     return Pool.fetch(this, token);
   }
 
-  public async getMemory(contractAddress, contractName, key) {
-    const fullKey = toKey(contractAddress, contractName, key);
+  public async getMemory(contractName, key) {
+    const fullKey = toKey(contractName, key);
     const response = await fetch(this.edgeServer() + "/memory/" + fullKey);
     const bytes = Buffer.from(await response.arrayBuffer());
 
@@ -161,8 +159,8 @@ export default class Client {
     }
   }
 
-  public async getStorage(contractAddress, contractName, key) {
-    const fullKey = toKey(contractAddress, contractName, key);
+  public async getStorage(contractName, key) {
+    const fullKey = toKey(contractName, key);
     const response = await fetch(this.edgeServer() + "/storage/" + fullKey);
     const bytes = Buffer.from(await response.arrayBuffer());
 

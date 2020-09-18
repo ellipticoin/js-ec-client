@@ -16,16 +16,16 @@ export default class Exchange extends Contract {
     "issuanceReserves",
   ];
   public static ethTokenId(address) {
-    return Array.from(padBuffer(Buffer.from(address, "hex"), 32));
+    return Buffer.from(address, "hex");
   }
   constructor(public client: Client) {
-    super(client, SYSTEM_ADDRESS, "Exchange");
+    super(client, "Exchange");
   }
 
   public async createPool(token, amount, initalPrice) {
     return this.post(
       "create_pool",
-      [token.issuer.toObject(), Array.from(token.id)],
+      [encodeAddress(token.issuer), Array.from(token.id)],
       amount,
       initalPrice,
     );
@@ -34,8 +34,8 @@ export default class Exchange extends Contract {
   public async swap(inputToken, outputToken, amount) {
     return this.post(
       "swap",
-      [inputToken.issuer.toObject(), Array.from(inputToken.id)],
-      [outputToken.issuer.toObject(), Array.from(outputToken.id)],
+      [encodeAddress(inputToken.issuer), Array.from(inputToken.id)],
+      [encodeAddress(outputToken.issuer), Array.from(outputToken.id)],
       amount,
     );
   }
@@ -43,7 +43,7 @@ export default class Exchange extends Contract {
   public async addLiquidity(token, amount) {
     return this.post(
       "add_liqidity",
-      [token.issuer.toObject(), Array.from(token.id)],
+      [encodeAddress(token.issuer), Array.from(token.id)],
       amount,
     );
   }
@@ -51,7 +51,7 @@ export default class Exchange extends Contract {
   public async removeLiquidity(token, amount) {
     return this.post(
       "remove_liqidity",
-      [token.issuer.toObject(), Array.from(token.id)],
+      [encodeAddress(token.issuer), Array.from(token.id)],
       amount,
     );
   }
